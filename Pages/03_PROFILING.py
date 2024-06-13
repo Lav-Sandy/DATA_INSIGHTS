@@ -18,16 +18,7 @@ import pandas_profiling
 from streamlit_pandas_profiling import st_profile_report
 from pydantic_settings import BaseSettings
 
-# from sqlalchemy import create_engine
-# from sqlalchemy.exc import SQLAlchemyError
-# from cx_Oracle import DatabaseError
-# import cx_Oracle
-# import snowflake.connector as sf
-# from Connection import *
-# from Get_Credentials import * 
 
-st.set_page_config( page_title="Data Testing App",layout="wide")
-#add_logo("I:\PKGDROP\Data Foundation Project\Voya.png",height=40)
 
 def add_logo1(logo_path, width, height):
     """Read and return a resized logo"""
@@ -59,35 +50,6 @@ def headerlayout():
     <br>
     """,True)
     
-    # blink_style = """
-        # @keyframes blink { 
-        # 0% {opacity:1; }
-        # 50% {opacity:0; }
-        # 100% {opacity:1;}
-        # }
-        
-        # .blink { animation: blink 1s infinite; 
-        # color: blue;
-        # }
-        
-        # .icon {
-        # font-size: 25px;
-        # vertical-align : middle;
-        # margin-right: 5px;
-        
-        # """
-        
-    # st.write ('<style>' + blink_style + '</style>', unsafe_allow_html = True)
-    # st.write ('<p class = "blink"><span class = "icon">⚠️</span> This Application is intended for NON PRODUCTION data only and developers of this application are not responsible for any violation.</p>',unsafe_allow_html = True)
-    # st.write ('Please follow the <a href = "https://voya.net/website/corporate.nsf/byUID/AMEP-BB4PLU"> DG policy guidelines </a>  before using any sensitive data.',unsafe_allow_html = True) 
-    
-    
-    
-# # Hide mainmenu and footer
-    # st.markdown(""" <style>
-    # #MainMenu {visibility: hidden;}
-    # </style> """, unsafe_allow_html=True)
-
 
 #remove the padding between components
     st.markdown("""
@@ -379,197 +341,7 @@ def file_profile():
     finally:
         pass   
         
-def ORACLE_DB():
-    
-    st.markdown("""
-    <style>
-           .css-z5fcl4 {
-                padding-top: 2rem;
-    </style>
-    """, unsafe_allow_html=True)
-    
-    placeholder = st.empty()
-    with placeholder.container():
-        st.markdown("<h1 style = 'text-align:center; color: Black;font-size:40px;'>PROFILE - ORACLE DATABASE</h1>", unsafe_allow_html = True)
-        st.markdown('<hr style = "border-top: 3px solid orange;">',unsafe_allow_html = True)
-        st.markdown (""" **_This script profiles datasets in Oracle database by taking query as an input. <br>
-                    <br>
-                 👉 Note: Header row or Column names are mandatory in flat file to derive descriptive measures.<br>
-                                                  <br>
-                    Please provide the DATABASE CONNECTION details and QUERY to profile the respective table._**<br>
-                """,True)
-    
-    try:
-        
-        placeholder1 = st.empty()
-        with placeholder1.container():
 
-            with st.form(key='Form1',clear_on_submit=True):              #,clear_on_submit=True
-                
-                st.markdown("<h1 style = 'text-align:center; color: Black;font-size:20px;'>DATABASE_DETAILS</h1>", unsafe_allow_html = True)
-                env_names_to_funcs = {  "CODS_INTEG" : CODS_INTG, "CODS_ACCP" : CODS_ACCP}
-                selected_db = st.sidebar.selectbox("Select ORACLE instance from below list", env_names_to_funcs.keys())
-                
-                st.text_input("Enter User Name", type="password", key = "orc1UserName")
-                st.text_input("Enter Password", type="password", key = "orclpwd")
-                
-                
-                def DB_CONNECT():
-            
-                    if selected_db:    
-                        orc1ServiceName,orc1Host,orc1Port = env_names_to_funcs[selected_db]()
-                        st.write(orc1ServiceName,orc1Host,orc1Port)
-                    if 'conn' not in st.session_state:
-                        st.session_state.conn  = connect_oracle(orc1Host,orc1Port,orc1ServiceName,st.session_state.orc1UserName,st.session_state.orclpwd);
-                    if st.session_state.conn:
-                        st.sidebar.success('Connection Successful', icon="✅")
-                    else:
-                        st.sidebar.error('Connection Failed!') 
-                
-                submitted=st.form_submit_button("Connect",on_click=DB_CONNECT)
-                
-             
-        st.sidebar.file_uploader("Upload parameter file", type=["xlsx"],key = "F2O_File")    
-        cmp = st.sidebar.button('Compare',key = "comp") 
-        
-        
-        css = """
-        <style>[data-testid="stForm"]{
-        background: Lavender;
-        }
-        </style>
-        """
-        st.write(css,unsafe_allow_html=True)
-            
-        if st.session_state.comp and st.session_state.conn:
-
-            df_dbq = pd.read_excel(st.session_state.F2O_File,header=None,sheet_name='ORACLE_QUERY',skiprows=2)
-            df_dbq.columns = ['File_Location','Table_Name','Key_Column','Query']
-            
-            placeholder.empty()
-            placeholder1.empty()
-            start_time = datetime.now()
-            results = DQ_MULFILES(df_dbq)
-            df3 = pd.DataFrame(results)
-            st.write(df3.style.hide_index()
-                .applymap(color_pass_fail, subset=['Status'])
-                .set_table_styles([
-                        {'selector': 'th', 'props': [('background-color', '#f7ffff'),    #00008B - Dark blue,  f7ffff - light blue
-                     ('color', 'black'),
-                     ('font-weight', 'bold')]},
-                        {'selector': 'td', 'props': [('background-color', '#E1F5FE'),
-                     ('font-size', '15px')]}
-                        ]).render(), unsafe_allow_html=True)
-            st.write('')
-            st.download_button( label="Download Summary Report", data=df3.to_csv().encode('utf-8'), file_name='Profiling_Summary.csv',mime='text/csv',key = "O2O_download")
-            st.write("Comparison Reports are saved under **Output** folder in location: **{}**".format(df_dbq.at[0,"File_Location"]),markdown=True)
-            TIME(start_time)
-            DB_CLOSE()
-            st.runtime.legacy_caching.clear_cache()
-
-     
-    except(AttributeError, AssertionError, UnboundLocalError, NameError, RuntimeError, ValueError,TypeError) as e:
-       # pass
-        st.exception(e)
-        if st.exception(e) and st.session_state.conn:
-            DB_CLOSE()
-            st.runtime.legacy_caching.clear_cache()      
-
-    finally:
-        pass   
-        
-def SNOWFLAKE_DB():
-    
-    st.markdown("""
-    <style>
-           .css-z5fcl4 {
-                padding-top: 2rem;
-    </style>
-    """, unsafe_allow_html=True)
-    
-    placeholder = st.empty()
-    with placeholder.container():
-        st.markdown("<h1 style = 'text-align:center; color: Black;font-size:40px;'>PROFILE - SNOWFLAKE DATABASE</h1>", unsafe_allow_html = True)
-        st.markdown('<hr style = "border-top: 3px solid orange;">',unsafe_allow_html = True)
-        st.markdown (""" **_This script profiles datasets in Snowflake database by taking query as an input. <br>
-                    <br>
-                 👉 Note: Header row or Column names are mandatory in flat file to derive descriptive measures.<br>
-                                                  <br>
-                    Please provide the DATABASE CONNECTION details and QUERY to profile the respective table._**<br>
-                """,True)
-    try:           
-        placeholder1 = st.empty()
-        with placeholder1.container():
-
-            with st.form(key='Form1',clear_on_submit=True):              #,clear_on_submit=True
-                
-                st.markdown("<h1 style = 'text-align:center; color: Black;font-size:20px;'>DATABASE_DETAILS</h1>", unsafe_allow_html = True)
-                page_names_to_funcs = {
-                    "IMD_INTEG": SNOWFLAKE_IMD_INTEG,
-                    "IMD_ACCP": SNOWFLAKE_IMD_ACCP,
-                   }   
-                selected_db = st.sidebar.selectbox("Select SNOWFLAKE instance from below list", page_names_to_funcs.keys())
-                st.text_input("Enter User Name", type="password", key = "SFUser")
-                st.text_input("Enter Password", type="password", key = "Snflpass")
-             
-                def DB_CONNECT():
-                    if selected_db:    
-                        SFAccount,SFDatabase,SFSchema,SFWarehouse,SFRole = page_names_to_funcs[selected_db]()
-                    if 'conn' not in st.session_state:
-                        st.session_state.conn  = connect_to_snowflake(SFAccount,st.session_state.SFUser,st.session_state.Snflpass,SFRole,SFWarehouse,SFDatabase); 
-                    if st.session_state.conn:
-                        st.sidebar.success('Connection Successful', icon="✅")
-                    else:
-                        st.sidebar.error('Connection Failed!')  
-
-                submitted=st.form_submit_button("Connect",on_click=DB_CONNECT)
-                
-        st.sidebar.file_uploader("Upload parameter file", type=["xlsx"],key = "SF_File")    
-        cmp = st.sidebar.button('Compare',key = "comp")         
-        
-        css = """
-        <style>[data-testid="stForm"]{
-        background: Lavender;
-        }
-        </style>
-        """
-        st.write(css,unsafe_allow_html=True)
-        
-        
-        if st.session_state.comp and st.session_state.conn:
-            df_dbq = pd.read_excel(st.session_state.SF_File,header=None,sheet_name='SNOWFLAKE_QUERY',skiprows=2)
-            df_dbq.columns = ['File_Location','Table_Name','Key_Column','Query']
-            
-            placeholder.empty()
-            placeholder1.empty()
-            start_time = datetime.now()
-            results = DQ_MULFILES(df_dbq)
-            df3 = pd.DataFrame(results)
-            st.write(df3.style.hide_index()
-                .applymap(color_pass_fail, subset=['Status'])
-                .set_table_styles([
-                        {'selector': 'th', 'props': [('background-color', '#f7ffff'),    #00008B - Dark blue,  f7ffff - light blue
-                     ('color', 'black'),
-                     ('font-weight', 'bold')]},
-                        {'selector': 'td', 'props': [('background-color', '#E1F5FE'),
-                     ('font-size', '15px')]}
-                        ]).render(), unsafe_allow_html=True)
-            st.write('')
-            st.download_button( label="Download Summary Report", data=df3.to_csv().encode('utf-8'), file_name='Profiling_Summary.csv',mime='text/csv',key = "O2O_download")
-            st.write("Comparison Reports are saved under **Output** folder in location: **{}**".format(df_dbq.at[0,"File_Location"]),markdown=True)
-            TIME(start_time)
-            DB_CLOSE()
-            st.runtime.legacy_caching.clear_cache()
-
-                
-    except(AttributeError,AssertionError, UnboundLocalError, NameError, RuntimeError, ValueError,TypeError) as e:
-        st.exception(e)
-        if st.exception(e) and st.session_state.conn:
-            DB_CLOSE()
-        st.runtime.legacy_caching.clear_cache()
-        
-    finally:
-        pass   
         
 def DEFAULT_VALUE():
     DEFAULT = '< PICK A VALUE >'
@@ -579,8 +351,7 @@ page_names_to_funcs = {
     "Select" : DEFAULT_VALUE,
     "BASIC_INSIGHTS": file_profile,
     "PANDAS_PROFILING": PANDAS_PROFILING,
-    # "Oracle Database": ORACLE_DB,
-    # "Snowflake Database": SNOWFLAKE_DB,
+
     }         
     
 selected_page = st.sidebar.selectbox("Choose one from the below list", page_names_to_funcs.keys())
