@@ -43,39 +43,7 @@ def headerlayout():
                 
                 
 
-    # blink_style = """
-        # @keyframes blink { 
-        # 0% {opacity:1; }
-        # 50% {opacity:0; }
-        # 100% {opacity:1;}
-        # }
-        
-        # .blink { animation: blink 1s infinite; 
-        # color: blue;
-        # }
-        
-        # .icon {
-        # font-size: 25px;
-        # vertical-align : middle;
-        # margin-right: 5px;
-        
-        # """
-        
-    # st.write ('<style>' + blink_style + '</style>', unsafe_allow_html = True)
-    # st.write ('<p class = "blink"><span class = "icon">⚠️</span> This Application is intended for NON PRODUCTION data only and developers of this application are not responsible for any violation.</p>',unsafe_allow_html = True)
-    # st.write ('Please follow the <a href = "https://voya.net/website/corporate.nsf/byUID/AMEP-BB4PLU"> DG policy guidelines </a>  before using any sensitive data.',unsafe_allow_html = True) 
-    
-    
-    
-    # my_logo2 =  add_logo(logo_path=r"I:\PKGDROP\Data Foundation Project\Architecture.jpg", width=550, height=350)
 
-    # col1, col2, col3 = st.columns([1,6,1])
-    # with col1:
-        # st.write(" ")
-    # with col2:
-        # st.image(my_logo2)
-    # with col3:
-        # st.write(" ")
 
     st.markdown(""" 📌**Note:** <br>
             The framework can be customized to suit as per any project specific needs. Please contact the below Email ID for further assistance.<br>
