@@ -81,31 +81,7 @@ def File_File_PYSPARK():
                     
                 """,True)
                 
-        # blink_style = """
-        # @keyframes blink { 
-        # 0% {opacity:1; }
-        # 50% {opacity:0; }
-        # 100% {opacity:1;}
-        # }
-        
-        # .blink { animation: blink 1s infinite; 
-        # color: blue;
-        # }
-        
-        # .icon {
-        # font-size: 25px;
-        # vertical-align : middle;
-        # margin-right: 5px;
-        
-        # """
-        
-        # st.write ('<style>' + blink_style + '</style>', unsafe_allow_html = True)
-        # st.write ('<p class = "blink"><span class = "icon">⚠️</span> This Application is intended for NON PRODUCTION data only and developers of this application are not responsible for any violation.</p>',unsafe_allow_html = True)
-        # st.write ('Please follow the <a href = "https://voya.net/website/corporate.nsf/byUID/AMEP-BB4PLU"> DG policy guidelines </a>  before using any sensitive data.',unsafe_allow_html = True) 
-    
-
-
-    
+ 
     global df1, df2,IDPHostName,IDPPort,IDPService_Name,pwd,IDPUID,Output
     
     # placeholder = st.empty()
@@ -145,7 +121,7 @@ def File_File_PYSPARK():
             SPARK_COMP(spark,df1,df2,PrimaryKey,tcName,Output,start_time)
             
         with st.sidebar.form(key='MyForm',clear_on_submit=True):
-            st.file_uploader("Upload parameter file", type=["xlsx"],key = "F2O_Spark_DB")
+            st.file_uploader("Upload parameter file", type=["xlsx","csv"],key = "F2O_Spark_DB")
             cmp=st.form_submit_button("Compare",on_click=COMPARE)
             if cmp:
                 placeholder.empty()   
