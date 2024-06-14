@@ -105,7 +105,7 @@ def DataFrame_Summary(df1,df2):
                     row_mismatch = True
                 else:
                     col_mismatch = True
-                df_summary.iloc[i,j] = '<span style = "color:red;font-weight:bold;">'+str(df_summary.iloc[i,j])+'</span>'
+                #df_summary.iloc[i,j] = '<span style = "color:red;font-weight:bold;">'+str(df_summary.iloc[i,j])+'</span>'
     st.write(df_summary.style.set_table_styles([
                     {'selector': 'th', 'props': [('background-color', '#f7ffff'),    #00008B - Dark blue,  f7ffff - light blue
                                      ('color', 'black'),
